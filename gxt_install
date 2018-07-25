@@ -1,0 +1,302 @@
+#!/bin/bash
+arg1=$1
+arg2=$2
+argCount=$#
+source /etc/profile
+source bin/engine
+source bin/public.sh
+source bin/tam.sh
+source bin/tsc.sh
+export engine_home=/usr/server/engine
+export work_dir=`pwd`
+mkdir -p /usr/server
+touch /usr/server/.tag
+echo $arg1 >/usr/server/.tag
+function usage()
+{
+echo -e  "\t\E[1;31mUsage: ./$(basename $0)  [ COMPONENTS ] [ OPTTIONS ]\E[0m"
+cat <<HELP
+	Components:
+        vulengine               web scanning  engine and host scanning  engine
+        portengine              port  scanning  engine  and  intranet asset discovery scanning engine
+        pocengine               0day san engine
+        mysql                   mysql db        
+        tsc                     all  engines and tsc  related components 
+	tam			tam related components
+	gxt			all  engines and tsc related components and tam related components
+
+	Options:
+        install                 The installation action will be triggered               
+        uninstall               The uinstallation action will be triggered
+
+        for example:
+        ./gxt_install   gxt      install   
+        all  the engines and  tsc related components and tam related components  will be installed
+HELP
+exit 0
+}
+main()
+{
+	if [ $argCount != 2 ];then
+					usage
+	elif [ $arg2 == "install" ];then
+			case $arg1 in 
+				vulengine)
+					confirm_ip
+					read_pubilc
+					read_tscinfo
+					network_test
+					time_sync
+					uninstall_jdk
+					uninstall_vulengine
+					install_jdk
+					install_vulengine
+					system_init
+					reg_service
+				;;
+				portengine)
+					confirm_ip
+					read_pubilc
+					read_tscinfo
+					network_test
+                                        uninstall_jdk
+					uninstall_portengine
+					time_sync
+                                        install_jdk
+                                        install_portengine
+					system_init
+					reg_service
+                                ;;
+				pocengine)
+					confirm_ip
+					read_pubilc
+					read_tscinfo
+					network_test
+                                        uninstall_jdk
+					uninstall_pocengine
+					time_sync
+                                        install_jdk
+                                        install_pocengine
+					system_init
+					reg_service
+                                ;;
+				mysql)
+					network_test
+					uninstall_mysql
+					time_sync
+					install_mysql
+					system_init
+				;;
+				tam) 
+					if [[ -d /usr/server/tsctomcat && -d /usr/server/mysql ]];then
+						read_company
+						confirm_ip
+						read_pubilc
+						read_tscinfo
+						network_test
+						time_sync
+						uninstall_jdk
+						uninstall_inspection
+						uninstall_tamtomcat
+						install_jdk
+						install_tamtomcat
+						install_inspection
+						install_fonts
+						init_tamdb
+						init_tamwar
+						init_tamfr
+						system_init
+						reg_service
+						tips
+					else
+						read_company
+						confirm_ip
+						read_pubilc
+                                                read_tscinfo
+                                                network_test
+                                                time_sync
+                                                uninstall_jdk
+						uninstall_inspection
+                                                uninstall_tamtomcat
+                                                uninstall_mysql
+                                                install_jdk
+                                                install_tamtomcat
+						install_inspection
+						install_fonts
+                                                install_mysql
+                                                init_tamdb
+                                                init_tamwar
+                                                init_tamfr
+                                                system_init
+                                                reg_service
+                                                tips
+					fi
+				;;
+                                tsc)
+                                        if [[ -d /usr/server/tamtomcat && -d /usr/server/mysql ]];then
+						confirm_ip
+						read_pubilc
+						read_tscinfo
+						network_test
+						time_sync
+						uninstall_jdk
+						uninstall_tsctomcat
+						uninstall_vulengine
+						uninstall_portengine
+						uninstall_pocengine
+						install_jdk
+						install_tsctomcat
+						install_vulengine
+						install_portengine
+						install_pocengine
+						init_tscdb
+						init_tscwar
+						init_tscfr
+						system_init
+						reg_service
+                                                tips
+                                        else
+						confirm_ip
+						read_pubilc
+						read_tscinfo
+						network_test
+						time_sync
+						uninstall_jdk
+						uninstall_tsctomcat
+						uninstall_mysql
+	
+						uninstall_vulengine
+						uninstall_portengine
+						uninstall_pocengine
+
+						install_jdk
+						install_tsctomcat
+						install_mysql
+
+						install_vulengine
+						install_portengine
+						install_pocengine
+
+						init_tscdb
+						init_tscwar
+						init_tscfr
+						system_init
+						reg_service
+						tips
+					fi
+												
+                                ;;
+                                gxt)
+					read_company
+                                        confirm_ip
+					read_pubilc
+                                        read_tscinfo
+                                        network_test
+                                        time_sync
+                                        uninstall_jdk
+                                        uninstall_tsctomcat
+					uninstall_inspection
+                                        uninstall_tamtomcat
+                                        uninstall_mysql
+
+                                        uninstall_vulengine
+                                        uninstall_portengine
+                                        uninstall_pocengine
+
+                                        install_jdk
+                                        install_tsctomcat
+                                        install_tamtomcat
+					install_inspection
+					install_fonts
+                                        install_mysql
+
+                                        install_vulengine
+                                        install_portengine
+                                        install_pocengine
+
+                                        init_tscdb
+                                        init_tamdb
+                                        init_tscwar
+                                        init_tamwar
+                                        init_tscfr
+                                        init_tamfr
+                                        system_init
+                                        reg_service
+                                        tips
+                                ;;
+				*)
+                                        usage
+			esac
+	elif [ $arg2 == "uninstall" ];then
+			case $arg1 in 
+				vulengine)
+                                        uninstall_jdk
+                                        uninstall_vulengine
+					unreg_service
+                                ;;
+                                portengine)
+                                        uninstall_jdk
+                                        uninstall_portengine
+					unreg_service
+                                ;;
+                                pocengine)
+                                        uninstall_jdk
+                                        uninstall_pocengine
+					unreg_service
+				;;
+				mysql)
+					uninstall_mysql
+					unreg_service
+                                ;;
+				tam)
+					if [[ -d /usr/server/tsctomcat && -d /usr/server/mysql ]];then
+						uninstall_inspection
+						uninstall_tamtomcat
+						uninstall_jdk
+						unreg_service
+					else
+						uninstall_inspection
+                                                uninstall_tamtomcat
+                                                uninstall_jdk
+                                                uninstall_mysql
+                                                unreg_service
+					fi
+				;;
+				tsc)
+                                        if [[ -d /usr/server/tamtomcat && -d /usr/server/mysql ]];then
+						uninstall_tsctomcat
+						uninstall_jdk
+						uninstall_vulengine
+						uninstall_portengine
+						uninstall_pocengine
+						unreg_service
+					else
+						uninstall_tsctomcat
+                                                uninstall_jdk
+                                                uninstall_mysql
+                                                uninstall_vulengine
+                                                uninstall_portengine
+                                                uninstall_pocengine
+                                                unreg_service
+					fi
+				;;
+				gxt)
+					uninstall_inspection
+					uninstall_tamtomcat
+					uninstall_tsctomcat
+					uninstall_jdk
+					uninstall_mysql
+					uninstall_vulengine
+					uninstall_portengine
+					uninstall_pocengine
+					unreg_service
+				;;
+				*)
+                                        usage
+			esac
+	else
+                                        usage
+
+	fi
+}
+main
