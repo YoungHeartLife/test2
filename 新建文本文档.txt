@@ -1,0 +1,32 @@
+
+#随机验证码
+import random
+temp = ''
+for i in range(6):
+    num = random.randrange(0,4)
+    if num == 3 or num == 4:
+        rad = random.randrange(0,10)
+        temp +=str(rad)
+    else:
+        i = random.randrange(65,90)
+        # print(i)
+        a=chr(i)
+        # print(a)
+        temp = temp + a
+print(temp)
+while True:
+    join = input()
+    if join == temp:
+        print('验证成功')
+        break;
+    else:
+        print('请重新输入验证码：')
+		
+#100个数的和
+sum = 0
+for i in range(101):
+    sum = sum+i
+print(sum)
+
+		
+		
